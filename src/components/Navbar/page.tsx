@@ -1,15 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@heroui/react";
+// We can remove the HeroUI Button import since you are using your custom button now
 import { AlignLeft, Mail, Menu, X } from "lucide-react";
+import BreezyButton from "../ui/breezy-button/breezy-button";
+
 
 // Change these to match your own sections
 const links = [
   { name: "About", href: "#about" },
   { name: "Projects", href: "#projects" },
   { name: "Skills", href: "#skills" },
-  { name: "Contact", href: "#contact" },
+  { name: "Resume", href: "#resume" },
 ];
 
 export default function Navbar() {
@@ -58,13 +60,16 @@ export default function Navbar() {
 
           {/* Button + mobile menu toggle */}
           <div className="flex items-center gap-2">
-            <Button
-              className="hidden h-[33px] w-[122px] min-w-0 gap-2 rounded-lg bg-white! text-[13px] font-medium text-black! md:flex"
-              onPress={goToContact}
-            >
-              <Mail size={14} />
-              Contact
-            </Button>
+            
+            {/* NEW: Replaced the old white button with your custom BreezyButton */}
+            <div className="hidden md:block">
+              <BreezyButton onClick={goToContact}>
+                <span className="flex items-center gap-2">
+                  <Mail size={14} />
+                  Resume
+                </span>
+              </BreezyButton>
+            </div>
 
             <button
               className="rounded-lg p-2 text-white/80 md:hidden"
@@ -90,14 +95,16 @@ export default function Navbar() {
                 </a>
               </li>
             ))}
-            <li>
-              <Button
-                className="h-[33px] w-full gap-2 rounded-lg bg-white! text-[13px] font-medium text-black!"
-                onPress={goToContact}
-              >
-                <Mail size={14} />
-                Contact
-              </Button>
+          {/* Mobile Button at the very bottom */}
+            {/* Mobile menu button */}
+            <li className="mt-4 w-full">
+              {/* Added !w-full to override the max-content CSS rule */}
+              <BreezyButton className="!w-full" onClick={goToContact}>
+                <span className="flex w-full items-center justify-center gap-2">
+                  <Mail size={14} />
+                  Resume
+                </span>
+              </BreezyButton>
             </li>
           </ul>
         )}
