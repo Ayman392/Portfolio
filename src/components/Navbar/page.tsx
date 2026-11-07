@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { AlignLeft, Mail, Menu } from "lucide-react";
+import { AlignLeft, FileText, Menu } from "lucide-react";
 import BreezyButton from "../ui/breezy-button/breezy-button";
 import { motion, useMotionValueEvent, useScroll } from "framer-motion";
 import {
@@ -31,9 +31,9 @@ export default function Navbar() {
     setHidden(latest > previous && latest > 120);
   });
 
-  // Scroll to the contact section when the button is pressed
-  function goToContact() {
-    document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" });
+  // Open the resume PDF in a new tab
+  function openResume() {
+    window.open("/Assets/Ayman_Nasir_Uddin_Resume.pdf", "_blank");
     setMenuOpen(false);
   }
 
@@ -78,9 +78,9 @@ export default function Navbar() {
           {/* Button + mobile menu button */}
           <div className="flex items-center gap-2">
             <div className="hidden md:block">
-              <BreezyButton onClick={goToContact}>
+              <BreezyButton onClick={openResume}>
                 <span className="flex items-center gap-2">
-                  <Mail size={14} />
+                  <FileText size={14} />
                   Resume
                 </span>
               </BreezyButton>
@@ -118,9 +118,9 @@ export default function Navbar() {
             </ul>
             {/* Button pushed to the bottom of the drawer */}
             <div className="mt-auto px-4 pb-6">
-              <BreezyButton onClick={goToContact}>
+              <BreezyButton onClick={openResume}>
                 <span className="flex items-center justify-center gap-2">
-                  <Mail size={14} />
+                  <FileText size={14} />
                   Resume
                 </span>
               </BreezyButton>
