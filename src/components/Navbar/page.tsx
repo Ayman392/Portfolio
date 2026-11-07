@@ -1,21 +1,35 @@
 "use client";
 
 import { useState } from "react";
-// We can remove the HeroUI Button import since you are using your custom button now
-import { AlignLeft, Mail, Menu, X } from "lucide-react";
+import { AlignLeft, Mail, Menu } from "lucide-react";
 import BreezyButton from "../ui/breezy-button/breezy-button";
-
+import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
 // Change these to match your own sections
 const links = [
   { name: "About", href: "#about" },
   { name: "Projects", href: "#projects" },
   { name: "Skills", href: "#skills" },
-  { name: "Resume", href: "#resume" },
+  { name: "Contact", href: "#contact" },
 ];
 
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const [hidden, setHidden] = useState(false);
+  const { scrollY } = useScroll();
+
+  // Hide the navbar when scrolling down, show it when scrolling up
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious() ?? 0;
+    setHidden(latest > previous && latest > 120);
+  });
 
   // Scroll to the contact section when the button is pressed
   function goToContact() {
@@ -24,9 +38,12 @@ export default function Navbar() {
   }
 
   return (
-    <nav
+    <motion.nav
       className="fixed top-5 left-1/2 z-50 -translate-x-1/2"
       style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: hidden && !menuOpen ? -100 : 0, opacity: 1 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
     >
       {/* Full width on mobile, exactly 704px on desktop */}
       <div className="w-[calc(100vw-2rem)] rounded-[24px] border border-white/20 bg-black/30 shadow-[0_8px_32px_rgba(0,0,0,0.45),inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-[28px] backdrop-saturate-150 md:w-[704px]">
@@ -58,10 +75,8 @@ export default function Navbar() {
             ))}
           </ul>
 
-          {/* Button + mobile menu toggle */}
+          {/* Button + mobile menu button */}
           <div className="flex items-center gap-2">
-            
-            {/* NEW: Replaced the old white button with your custom BreezyButton */}
             <div className="hidden md:block">
               <BreezyButton onClick={goToContact}>
                 <span className="flex items-center gap-2">
@@ -73,42 +88,46 @@ export default function Navbar() {
 
             <button
               className="rounded-lg p-2 text-white/80 md:hidden"
-              aria-label="Toggle menu"
-              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label="Open menu"
+              onClick={() => setMenuOpen(true)}
             >
-              {menuOpen ? <X size={22} /> : <Menu size={22} />}
+              <Menu size={22} />
             </button>
           </div>
         </header>
 
-        {/* Mobile menu */}
-        {menuOpen && (
-          <ul className="flex flex-col gap-4 border-t border-white/10 px-4 py-4 md:hidden">
-            {links.map((link) => (
-              <li key={link.name}>
-                <a
-                  href={link.href}
-                  className="text-sm font-medium text-white/70"
-                  onClick={() => setMenuOpen(false)}
-                >
-                  {link.name}
-                </a>
-              </li>
-            ))}
-          {/* Mobile Button at the very bottom */}
-            {/* Mobile menu button */}
-            <li className="mt-4 w-full">
-              {/* Added !w-full to override the max-content CSS rule */}
-              <BreezyButton className="!w-full" onClick={goToContact}>
-                <span className="flex w-full items-center justify-center gap-2">
+        {/* Mobile menu (slides in from the right) */}
+        <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+          <SheetContent side="right">
+            <SheetHeader>
+              <SheetTitle>Ayman Nasir Uddin</SheetTitle>
+            </SheetHeader>
+
+            <ul className="flex flex-col gap-6 px-4">
+              {links.map((link) => (
+                <li key={link.name}>
+                  <a
+                    href={link.href}
+                    className="text-2xl font-medium"
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    {link.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+            {/* Button pushed to the bottom of the drawer */}
+            <div className="mt-auto px-4 pb-6">
+              <BreezyButton onClick={goToContact}>
+                <span className="flex items-center justify-center gap-2">
                   <Mail size={14} />
                   Resume
                 </span>
               </BreezyButton>
-            </li>
-          </ul>
-        )}
+            </div>
+          </SheetContent>
+        </Sheet>
       </div>
-    </nav>
+    </motion.nav>
   );
 }
