@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import ScrollProgress from "@/components/ui/scroll-progress";
 import { SmoothScroll } from "@/components/ui/smooth-scroll";
 import Navbar from "@/components/Navbar/page";
 
@@ -25,8 +26,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${inter.variable} ${geistMono.variable} dark h-full antialiased`}
     >
-      <body className={`${inter.className} min-h-full flex flex-col tracking-tight`}>
+      <body
+        className={`${inter.className} min-h-full flex flex-col tracking-tight`}
+      >
         <SmoothScroll>
+          <ScrollProgress />
           <Navbar />
           {children}
         </SmoothScroll>
