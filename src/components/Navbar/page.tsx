@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AlignLeft, FileText, Menu } from "lucide-react";
 import BreezyButton from "../ui/breezy-button/breezy-button";
-import { motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Sheet,
   SheetContent,
@@ -22,15 +22,6 @@ const links = [
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const [hidden, setHidden] = useState(false);
-  const { scrollY } = useScroll();
-
-  // Hide the navbar when scrolling down, show it when scrolling up
-  useMotionValueEvent(scrollY, "change", (latest) => {
-    const previous = scrollY.getPrevious() ?? 0;
-    setHidden(latest > previous && latest > 120);
-  });
-
   // Open the resume PDF in a new tab
   function openResume() {
     window.open("/Assets/Ayman_Nasir_Uddin_Resume.pdf", "_blank");
@@ -42,7 +33,7 @@ export default function Navbar() {
       className="fixed top-5 left-1/2 z-50 -translate-x-1/2"
       style={{ fontFamily: "var(--font-inter), system-ui, sans-serif" }}
       initial={{ y: -100, opacity: 0 }}
-      animate={{ y: hidden && !menuOpen ? -100 : 0, opacity: 1 }}
+      animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
     >
       {/* Full width on mobile, exactly 704px on desktop */}
