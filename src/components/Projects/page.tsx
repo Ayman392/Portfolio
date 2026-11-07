@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { fadeUp, stagger, viewport } from "@/lib/motion";
+import Image from "next/image";
 
 // Add or edit your projects here
 const projects = [
@@ -10,8 +11,18 @@ const projects = [
     name: "Oikyo",
     description:
       "A community platform where people create, discover and join social service events across Bangladesh, with an event map, calendar and list views, and an owner-only dashboard.",
-    tech: ["Next.js", "TypeScript", "Tailwind CSS", "MongoDB", "HeroUI", "shadcn/ui", "Better Auth", "Leaflet"],
-    github: "https://github.com/Ayman392/Oikyo-Social-Development-Events-Platform-Client",
+    tech: [
+      "Next.js",
+      "TypeScript",
+      "Tailwind CSS",
+      "MongoDB",
+      "HeroUI",
+      "shadcn/ui",
+      "Better Auth",
+      "Leaflet",
+    ],
+    github:
+      "https://github.com/Ayman392/Oikyo-Social-Development-Events-Platform-Client",
     live: "https://oikyo-psi.vercel.app",
     image: "/Assets/oikyo.png", // set to "" if you don't have a picture yet
     gradient: "from-sky-500 to-indigo-600",
@@ -66,10 +77,12 @@ export default function Projects() {
                 }`}
               >
                 {project.image ? (
-                  <img
+                  <Image
                     src={project.image}
                     alt={`${project.name} landing page`}
-                    className="absolute inset-0 h-full w-full object-cover object-top"
+                    fill
+                    sizes="(min-width: 1024px) 1024px, 100vw"
+                    className="object-cover object-top"
                   />
                 ) : (
                   <div className="flex h-full items-center justify-center">
