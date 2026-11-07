@@ -1,7 +1,15 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import {
+  animate,
+  motion,
+  useInView,
+  useMotionValue,
+  useTransform,
+  type Variants,
+} from "framer-motion";
 import {
   ArrowUpRight,
   FolderOpen,
@@ -11,7 +19,7 @@ import {
   MapPin,
   Target,
 } from "lucide-react";
-import { fadeUp, stagger, viewport } from "@/lib/motion";
+import { stagger, viewport } from "@/lib/motion";
 
 // Put your picture in public/Assets and set the path here, for example "/Assets/me.jpg"
 // Leave it as "" to show your initials instead
@@ -27,6 +35,43 @@ const stack = [
   "MongoDB",
   "Git & GitHub",
 ];
+
+// Cards pop in with a little spring
+const popIn: Variants = {
+  hidden: { opacity: 0, scale: 0.9, y: 24 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 200, damping: 20 },
+  },
+};
+
+// Stack chips pop in one after another
+const chipVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.6 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { type: "spring", stiffness: 300, damping: 15 },
+  },
+};
+
+// A number that counts up from 0 when it scrolls into view
+function CountUp({ to }: { to: number }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true });
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (value) => Math.round(value));
+
+  useEffect(() => {
+    if (!inView) return;
+    const controls = animate(count, to, { duration: 1.5, ease: "easeOut" });
+    return () => controls.stop();
+  }, [inView, count, to]);
+
+  return <motion.span ref={ref}>{rounded}</motion.span>;
+}
 
 // A small glass card with an icon and a label, used for every widget below
 // "span" is the grid width, "className" is any extra look for the inner card
@@ -44,18 +89,20 @@ function Widget({
   children: React.ReactNode;
 }) {
   return (
-    // Outer box: sits in the grid and fades in
-    <motion.div variants={fadeUp} className={span}>
-      {/* Inner box: the glass look and the hover lift */}
-      <div
-        className={`h-full rounded-[28px] border border-white/10 bg-white/5 p-6 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:border-white/20 ${className}`}
+    // Outer box: sits in the grid and pops in
+    <motion.div variants={popIn} className={span}>
+      {/* Inner box: the glass look, and a springy lift on hover */}
+      <motion.div
+        whileHover={{ y: -4 }}
+        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        className={`h-full rounded-[28px] border border-white/10 bg-white/5 p-6 backdrop-blur-xl transition-colors duration-300 hover:border-white/20 ${className}`}
       >
         <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-white/40">
           {icon}
           {label}
         </div>
         <div className="mt-4">{children}</div>
-      </div>
+      </motion.div>
     </motion.div>
   );
 }
@@ -77,16 +124,28 @@ export default function About() {
       >
         {/* Profile card (big) */}
         <motion.div
-          variants={fadeUp}
+          variants={popIn}
           className="relative overflow-hidden rounded-[28px] border border-white/10 bg-white/5 p-8 backdrop-blur-xl md:col-span-2 md:row-span-2"
         >
-          {/* Soft glow in the corners */}
-          <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-600/30 blur-[90px]" />
-          <div className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-orange-500/20 blur-[90px]" />
+          {/* Soft glow in the corners, drifting slowly */}
+          <motion.div
+            className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-600/30 blur-[90px]"
+            animate={{ x: [0, -30, 0], y: [0, 20, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="pointer-events-none absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-orange-500/20 blur-[90px]"
+            animate={{ x: [0, 30, 0], y: [0, -20, 0] }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
 
           <div className="relative">
-            {/* Photo, or initials if there is no photo */}
-            <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-500 to-indigo-600 text-4xl font-bold text-white ring-1 ring-white/20">
+            {/* Photo, or initials if there is no photo. It tilts on hover */}
+            <motion.div
+              whileHover={{ rotate: -6, scale: 1.06 }}
+              transition={{ type: "spring", stiffness: 300, damping: 15 }}
+              className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[32px] bg-gradient-to-br from-sky-500 to-indigo-600 text-4xl font-bold text-white ring-1 ring-white/20"
+            >
               {photo ? (
                 <Image
                   src={photo}
@@ -98,7 +157,7 @@ export default function About() {
               ) : (
                 "AN"
               )}
-            </div>
+            </motion.div>
 
             <h3 className="mt-6 text-3xl font-semibold tracking-tight text-white">
               Ayman Nasir Uddin
@@ -117,22 +176,28 @@ export default function About() {
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <a
+              <motion.a
                 href="https://github.com/Ayman392"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white/80 transition hover:bg-white/20"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.94 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className="inline-flex items-center gap-1 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white/80 hover:bg-white/20"
               >
                 GitHub <ArrowUpRight size={14} />
-              </a>
-              <a
+              </motion.a>
+              <motion.a
                 href="https://www.linkedin.com/in/aymannasir1/"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white/80 transition hover:bg-white/20"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.94 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                className="inline-flex items-center gap-1 rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium text-white/80 hover:bg-white/20"
               >
                 LinkedIn <ArrowUpRight size={14} />
-              </a>
+              </motion.a>
             </div>
           </div>
         </motion.div>
@@ -162,7 +227,9 @@ export default function About() {
 
         {/* Projects count: update the number when you add more projects */}
         <Widget icon={<FolderOpen size={14} />} label="Projects">
-          <p className="text-5xl font-bold tracking-tighter text-white">3</p>
+          <p className="text-5xl font-bold tracking-tighter text-white">
+            <CountUp to={3} />
+          </p>
           <p className="mt-1 text-sm text-white/60">projects built</p>
         </Widget>
 
@@ -197,22 +264,25 @@ export default function About() {
           </ul>
         </Widget>
 
-        {/* Stack */}
+        {/* Stack: the chips pop in one after another */}
         <Widget
           icon={<Layers size={14} />}
           label="Main stack"
           span="md:col-span-4"
         >
-          <div className="flex flex-wrap gap-2">
+          <motion.div variants={stagger()} className="flex flex-wrap gap-2">
             {stack.map((name) => (
-              <span
+              <motion.span
                 key={name}
+                variants={chipVariants}
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 15 }}
                 className="rounded-full bg-white/10 px-4 py-1.5 text-sm text-white/80"
               >
                 {name}
-              </span>
+              </motion.span>
             ))}
-          </div>
+          </motion.div>
         </Widget>
       </motion.div>
     </section>

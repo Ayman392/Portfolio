@@ -22,6 +22,9 @@ const links = [
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Which link the mouse is on (null when it is on none)
+  const [hoveredLink, setHoveredLink] = useState<string | null>(null);
+
   // Open the resume PDF in a new tab
   function openResume() {
     window.open("/Assets/Ayman_Nasir_Uddin_Resume.pdf", "_blank");
@@ -53,12 +56,27 @@ export default function Navbar() {
           </a>
 
           {/* Links (hidden on mobile) */}
-          <ul className="hidden items-center gap-5 md:flex">
+          <ul
+            className="hidden items-center gap-1 md:flex"
+            onMouseLeave={() => setHoveredLink(null)}
+          >
             {links.map((link) => (
-              <li key={link.name}>
+              <li
+                key={link.name}
+                className="relative"
+                onMouseEnter={() => setHoveredLink(link.name)}
+              >
+                {/* The glass pill that slides between links */}
+                {hoveredLink === link.name && (
+                  <motion.span
+                    layoutId="nav-pill"
+                    className="absolute inset-0 rounded-full bg-white/10"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
                 <a
                   href={link.href}
-                  className="text-sm font-medium tracking-tight text-white/55 transition hover:text-white"
+                  className="relative block px-3 py-1.5 text-sm font-medium tracking-tight text-white/55 transition hover:text-white"
                 >
                   {link.name}
                 </a>

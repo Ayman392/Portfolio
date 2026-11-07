@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import { fadeUp, stagger, viewport } from "@/lib/motion";
 
 // Add or edit your skills here
@@ -27,6 +27,32 @@ const groups = [
   },
 ];
 
+// Each row slides in from the left, and nudges right when you hover it
+const rowVariants: Variants = {
+  hidden: { opacity: 0, x: -24 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.4 } },
+  hover: {
+    x: 6,
+    transition: { type: "spring", stiffness: 400, damping: 25 },
+  },
+};
+
+// Each colored tile pops in with a bounce, and tilts when you hover its row
+const tileVariants: Variants = {
+  hidden: { opacity: 0, scale: 0, rotate: -20 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    rotate: 0,
+    transition: { type: "spring", stiffness: 300, damping: 15, delay: 0.1 },
+  },
+  hover: {
+    scale: 1.15,
+    rotate: 6,
+    transition: { type: "spring", stiffness: 400, damping: 15 },
+  },
+};
+
 export default function Skills() {
   return (
     <section id="skills" className="mx-auto max-w-5xl px-6 py-28">
@@ -50,22 +76,29 @@ export default function Skills() {
               {group.title}
             </p>
 
-            <ul className="divide-y divide-white/10 overflow-hidden rounded-[28px] border border-white/10 bg-white/5 backdrop-blur-xl transition duration-300 hover:border-white/20">
+            {/* The rows inside appear one after another */}
+            <motion.ul
+              variants={stagger()}
+              className="divide-y divide-white/10 overflow-hidden rounded-[28px] border border-white/10 bg-white/5 backdrop-blur-xl transition duration-300 hover:border-white/20"
+            >
               {group.skills.map((skill) => (
-                <li
+                <motion.li
                   key={skill}
-                  className="flex items-center gap-4 px-5 py-3.5 transition hover:bg-white/5"
+                  variants={rowVariants}
+                  whileHover="hover"
+                  className="flex items-center gap-4 px-5 py-3.5 transition-colors hover:bg-white/5"
                 >
                   {/* Colored tile with the first letter */}
-                  <span
+                  <motion.span
+                    variants={tileVariants}
                     className={`flex h-8 w-8 items-center justify-center rounded-[10px] bg-gradient-to-br ${group.color} text-sm font-semibold text-white`}
                   >
                     {skill[0]}
-                  </span>
+                  </motion.span>
                   <span className="text-white">{skill}</span>
-                </li>
+                </motion.li>
               ))}
-            </ul>
+            </motion.ul>
           </motion.div>
         ))}
       </motion.div>
