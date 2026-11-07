@@ -3,11 +3,13 @@
 import { motion } from "framer-motion";
 import { fadeUp, stagger, viewport } from "@/lib/motion";
 import Hero from "@/components/Hero/page";
+import Projects from "@/components/Projects/page";
 
 export default function Home() {
   return (
     <main>
       <Hero />
+      <Projects/>
 
       {/* Temporary test block. Delete once the real sections exist. */}
       <div className="mx-auto max-w-2xl px-6">
